@@ -27,7 +27,6 @@
             background: rgba(0, 0, 0, 0.8);
             box-shadow: 0 0 50px rgba(255, 140, 0, 0.1);
             overflow: hidden;
-            touch-action: pan-y;
         }
 
         .view-container {
@@ -256,7 +255,6 @@
             transition: all 0.3s ease;
             position: relative;
             overflow: hidden;
-            touch-action: pan-y;
         }
 
         .goal-item:hover {
@@ -659,11 +657,6 @@
         let currentCategory = '';
         let subgoalCounter = 0;
         let goalToDelete = null;
-        let viewSwipeData = {
-            startX: 0,
-            currentX: 0,
-            isSwipping: false
-        };
 
         let goals = {
             spiritual: [],
@@ -734,72 +727,7 @@
             saveData();
         }
 
-        // Функции свайпа между экранами
-        function setupViewSwipe() {
-            const viewContainer = document.getElementById('viewContainer');
-            
-            viewContainer.addEventListener('touchstart', handleViewSwipeStart, { passive: true });
-            viewContainer.addEventListener('touchmove', handleViewSwipeMove, { passive: false });
-            viewContainer.addEventListener('touchend', handleViewSwipeEnd, { passive: true });
-        }
-
-        function handleViewSwipeStart(e) {
-            viewSwipeData.startX = e.touches[0].clientX;
-            viewSwipeData.currentX = viewSwipeData.startX;
-            viewSwipeData.isSwipping = true;
-            document.getElementById('viewContainer').classList.add('swiping');
-        }
-
-        function handleViewSwipeMove(e) {
-            if (!viewSwipeData.isSwipping) return;
-            
-            e.preventDefault();
-            viewSwipeData.currentX = e.touches[0].clientX;
-            const deltaX = viewSwipeData.currentX - viewSwipeData.startX;
-            
-            const currentTransform = getCurrentTransform();
-            let newTransform = currentTransform + (deltaX / window.innerWidth) * 50;
-            
-            // Ограничиваем движение
-            newTransform = Math.max(-50, Math.min(0, newTransform));
-            
-            document.getElementById('viewContainer').style.transform = `translateX(${newTransform}%)`;
-        }
-
-        function handleViewSwipeEnd(e) {
-            if (!viewSwipeData.isSwipping) return;
-            
-            viewSwipeData.isSwipping = false;
-            document.getElementById('viewContainer').classList.remove('swiping');
-            
-            const deltaX = viewSwipeData.currentX - viewSwipeData.startX;
-            const threshold = 100;
-            
-            const currentTransform = getCurrentTransform();
-            
-            if (Math.abs(deltaX) > threshold) {
-                if (deltaX > 0 && currentTransform < 0) {
-                    // Свайп вправо - возврат к главному меню
-                    backToMain();
-                } else if (deltaX < 0 && currentTransform >= 0 && currentCategory) {
-                    // Свайп влево - переход к категории (если есть активная)
-                    document.getElementById('viewContainer').style.transform = 'translateX(-50%)';
-                }
-            } else {
-                // Возврат к текущему состоянию
-                if (currentTransform < -25) {
-                    document.getElementById('viewContainer').style.transform = 'translateX(-50%)';
-                } else {
-                    document.getElementById('viewContainer').style.transform = 'translateX(0%)';
-                }
-            }
-        }
-
-        function getCurrentTransform() {
-            const transform = document.getElementById('viewContainer').style.transform;
-            const match = transform.match(/translateX\((-?\d+(?:\.\d+)?)%\)/);
-            return match ? parseFloat(match[1]) : 0;
-        }
+        // Функции свайпа между экранами убраны для лучшей прокрутки
 
         function calculateGoalProgress(goal) {
             if (goal.subgoals && goal.subgoals.length > 0) {
@@ -1324,7 +1252,6 @@
 
         document.addEventListener('DOMContentLoaded', function() {
             loadData();
-            setupViewSwipe();
             updateBatteryIndicator();
             
             const today = new Date().toISOString().split('T')[0];
@@ -1351,5 +1278,5 @@
             showNotification('Добро пожаловать в "Мои цели!"');
         });
     </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'97ac726e6238373c',t:'MTc1NzE0NTc3Ni4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'97ac780d82c9d22e',t:'MTc1NzE0NjAwNi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
