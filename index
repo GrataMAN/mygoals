@@ -1,0 +1,1078 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Мои цели!</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+            color: white;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .app-container {
+            max-width: 400px;
+            margin: 0 auto;
+            min-height: 100vh;
+            position: relative;
+            background: rgba(0, 0, 0, 0.8);
+            box-shadow: 0 0 50px rgba(255, 140, 0, 0.1);
+        }
+
+        .header {
+            text-align: center;
+            padding: 30px 20px;
+            background: linear-gradient(45deg, #1a1a1a, #2a2a2a);
+            border-bottom: 2px solid rgba(255, 140, 0, 0.3);
+        }
+
+        .app-title {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #ff8c00;
+            text-shadow: 0 0 20px #ff8c00, 0 0 40px #ff8c00;
+            animation: pulse 2s infinite;
+            margin-bottom: 10px;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.8; transform: scale(1.05); }
+        }
+
+        .subtitle {
+            color: #ccc;
+            font-size: 0.9rem;
+        }
+
+        .main-content {
+            padding: 20px;
+        }
+
+        .battery-indicator {
+            background: rgba(255, 140, 0, 0.1);
+            border: 2px solid #ff8c00;
+            border-radius: 20px;
+            padding: 15px;
+            margin-bottom: 30px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .battery-fill {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            background: linear-gradient(90deg, #ff8c00, #ffaa00);
+            border-radius: 18px;
+            transition: width 0.5s ease;
+            opacity: 0.3;
+        }
+
+        .battery-text {
+            position: relative;
+            z-index: 2;
+            font-weight: bold;
+            color: #ff8c00;
+        }
+
+        .categories-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .category-card {
+            background: linear-gradient(135deg, #2a2a2a, #1a1a1a);
+            border: 2px solid rgba(255, 140, 0, 0.3);
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .category-card:hover {
+            border-color: #ff8c00;
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(255, 140, 0, 0.3);
+        }
+
+        .category-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255, 140, 0, 0.1), transparent);
+            transform: rotate(45deg);
+            transition: all 0.5s ease;
+            opacity: 0;
+        }
+
+        .category-card:hover::before {
+            opacity: 1;
+            animation: shine 0.5s ease;
+        }
+
+        @keyframes shine {
+            0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+            100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+        }
+
+        .category-icon {
+            font-size: 2rem;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .category-name {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .category-count {
+            color: #ff8c00;
+            font-size: 0.8rem;
+        }
+
+        .motivational-section {
+            background: rgba(255, 140, 0, 0.1);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255, 140, 0, 0.3);
+        }
+
+        .section-title {
+            color: #ff8c00;
+            font-weight: bold;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
+
+        .motivation-text {
+            color: #ccc;
+            line-height: 1.5;
+            margin-bottom: 15px;
+        }
+
+        .urgent-goals {
+            background: rgba(255, 0, 0, 0.1);
+            border: 1px solid rgba(255, 0, 0, 0.3);
+            border-radius: 10px;
+            padding: 15px;
+        }
+
+        .urgent-goal {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255, 140, 0, 0.2);
+        }
+
+        .urgent-goal:last-child {
+            border-bottom: none;
+        }
+
+        .goal-name {
+            font-weight: bold;
+        }
+
+        .deadline {
+            color: #ff4444;
+            font-size: 0.8rem;
+            animation: blink 1s infinite;
+        }
+
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0.5; }
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .category-view {
+            padding: 20px;
+        }
+
+        .back-button {
+            background: rgba(255, 140, 0, 0.2);
+            border: 2px solid #ff8c00;
+            color: #ff8c00;
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            margin-bottom: 20px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .back-button:hover {
+            background: #ff8c00;
+            color: black;
+            transform: scale(1.05);
+        }
+
+        .new-goal-button {
+            background: linear-gradient(45deg, #ff8c00, #ffaa00);
+            border: none;
+            color: black;
+            padding: 15px 30px;
+            border-radius: 25px;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+            margin-bottom: 20px;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(255, 140, 0, 0.3);
+        }
+
+        .new-goal-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(255, 140, 0, 0.5);
+        }
+
+        .goals-list {
+            space-y: 15px;
+        }
+
+        .goal-item {
+            background: rgba(255, 140, 0, 0.1);
+            border: 1px solid rgba(255, 140, 0, 0.3);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .goal-item:hover {
+            background: rgba(255, 140, 0, 0.2);
+            transform: translateX(5px);
+        }
+
+        .goal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .goal-title {
+            font-weight: bold;
+            color: white;
+        }
+
+        .goal-status {
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        .status-active {
+            background: rgba(255, 140, 0, 0.3);
+            color: #ff8c00;
+        }
+
+        .status-completed {
+            background: rgba(0, 255, 0, 0.3);
+            color: #00ff00;
+        }
+
+        .goal-progress {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            height: 8px;
+            margin: 10px 0;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #ff8c00, #ffaa00);
+            border-radius: 10px;
+            transition: width 0.5s ease;
+        }
+
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal.hidden {
+            display: none !important;
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, #2a2a2a, #1a1a1a);
+            border: 2px solid #ff8c00;
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 350px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-title {
+            color: #ff8c00;
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            color: #ccc;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid rgba(255, 140, 0, 0.3);
+            border-radius: 10px;
+            background: rgba(0, 0, 0, 0.5);
+            color: white;
+            font-size: 1rem;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #ff8c00;
+            box-shadow: 0 0 10px rgba(255, 140, 0, 0.3);
+        }
+
+        .form-textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .btn-primary {
+            flex: 1;
+            background: linear-gradient(45deg, #ff8c00, #ffaa00);
+            border: none;
+            color: black;
+            padding: 12px;
+            border-radius: 10px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-secondary {
+            flex: 1;
+            background: transparent;
+            border: 2px solid #ff8c00;
+            color: #ff8c00;
+            padding: 12px;
+            border-radius: 10px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover, .btn-secondary:hover {
+            transform: translateY(-2px);
+        }
+
+        .subgoals-section {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 140, 0, 0.3);
+        }
+
+        .subgoal-item {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 140, 0, 0.2);
+            border-radius: 8px;
+            padding: 10px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .add-subgoal-btn {
+            background: rgba(255, 140, 0, 0.2);
+            border: 1px dashed #ff8c00;
+            color: #ff8c00;
+            padding: 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            text-align: center;
+            margin-top: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .add-subgoal-btn:hover {
+            background: rgba(255, 140, 0, 0.3);
+        }
+
+        @media (max-width: 480px) {
+            .app-title {
+                font-size: 2rem;
+            }
+            
+            .categories-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .modal-content {
+                width: 95%;
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Главное меню -->
+        <div id="main-view">
+            <div class="header">
+                <h1 class="app-title">Мои цели!</h1>
+                <p style="color: #8b949e; font-size: 0.9rem; margin-top: 10px; font-style: italic;" id="goalTip">💡 Разбивайте большие цели на маленькие шаги - так легче начать!</p>
+            </div>
+
+            <div class="main-content">
+                <!-- Индикатор прогресса -->
+                <div class="battery-indicator">
+                    <div class="battery-fill" id="batteryFill" style="width: 35%"></div>
+                    <div class="battery-text">Выполнено: <span id="completedCount">7</span> из <span id="totalCount">20</span> целей</div>
+                </div>
+
+                <!-- Категории целей -->
+                <div class="categories-grid">
+                    <div class="category-card" onclick="openCategory('spiritual')">
+                        <span class="category-icon">🙏</span>
+                        <div class="category-name">Духовные цели</div>
+                        <div class="category-count" id="spiritual-count">0 целей</div>
+                    </div>
+                    <div class="category-card" onclick="openCategory('family')">
+                        <span class="category-icon">👨‍👩‍👧‍👦</span>
+                        <div class="category-name">Семья и друзья</div>
+                        <div class="category-count" id="family-count">0 целей</div>
+                    </div>
+                    <div class="category-card" onclick="openCategory('health')">
+                        <span class="category-icon">💪</span>
+                        <div class="category-name">Здоровье</div>
+                        <div class="category-count" id="health-count">0 целей</div>
+                    </div>
+                    <div class="category-card" onclick="openCategory('personal')">
+                        <span class="category-icon">🌱</span>
+                        <div class="category-name">Личностный рост</div>
+                        <div class="category-count" id="personal-count">0 целей</div>
+                    </div>
+                    <div class="category-card" onclick="openCategory('career')">
+                        <span class="category-icon">💼</span>
+                        <div class="category-name">Карьера и финансы</div>
+                        <div class="category-count" id="career-count">2 цели</div>
+                    </div>
+                    <div class="category-card" onclick="openCategory('hobbies')">
+                        <span class="category-icon">🎨</span>
+                        <div class="category-name">Хобби и отдых</div>
+                        <div class="category-count" id="hobbies-count">0 целей</div>
+                    </div>
+                </div>
+
+                <!-- Горящие сроки (показывается только если есть) -->
+                <div class="motivational-section" id="urgentSection" style="display: none;">
+                    <h3 class="section-title">🔥 Горящие сроки</h3>
+                    <div class="urgent-goals" id="urgentGoals">
+                    </div>
+                </div>
+
+                <!-- Мотивация дня -->
+                <div class="motivational-section" style="margin-bottom: 20px;">
+                    <h3 class="section-title">💡 Мотивация дня</h3>
+                    <p class="motivation-text" id="dailyMotivation">"Успех - это сумма небольших усилий, повторяемых изо дня в день."</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Вид категории -->
+        <div id="category-view" class="hidden">
+            <div class="header">
+                <button class="back-button" onclick="backToMain()">← Назад</button>
+                <h2 id="categoryTitle" class="app-title" style="font-size: 1.8rem; margin: 10px 0;">Работа</h2>
+            </div>
+
+            <div class="category-view">
+                <button class="new-goal-button" onclick="openNewGoalModal()">+ Новая цель</button>
+                
+                <div class="goals-list" id="goalsList">
+                    <div class="goal-item" onclick="openGoalDetails('goal1')">
+                        <div class="goal-header">
+                            <span class="goal-title">Завершить проект веб-сайта</span>
+                            <span class="goal-status status-active">Активна</span>
+                        </div>
+                        <div class="goal-progress">
+                            <div class="progress-fill" style="width: 75%"></div>
+                        </div>
+                        <div style="color: #ccc; font-size: 0.9rem;">Дедлайн: 15 декабря 2024</div>
+                    </div>
+
+                    <div class="goal-item" onclick="openGoalDetails('goal2')">
+                        <div class="goal-header">
+                            <span class="goal-title">Изучить новую технологию</span>
+                            <span class="goal-status status-completed">Завершена</span>
+                        </div>
+                        <div class="goal-progress">
+                            <div class="progress-fill" style="width: 100%"></div>
+                        </div>
+                        <div style="color: #ccc; font-size: 0.9rem;">Завершено: 10 декабря 2024</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно создания цели -->
+    <div id="newGoalModal" class="modal hidden" onclick="closeModalOnBackdrop(event)">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <h3 class="modal-title">Новая цель</h3>
+            
+            <div class="form-group">
+                <label class="form-label">Название цели</label>
+                <input type="text" class="form-input" id="goalName" placeholder="Введите название цели">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Описание</label>
+                <textarea class="form-input form-textarea" id="goalDescription" placeholder="Опишите вашу цель"></textarea>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Дедлайн</label>
+                <input type="date" class="form-input" id="goalDeadline">
+            </div>
+
+            <div class="subgoals-section">
+                <h4 class="section-title">Подцели</h4>
+                <div id="subgoalsList">
+                    <!-- Подцели будут добавляться здесь -->
+                </div>
+                <div class="add-subgoal-btn" onclick="addSubgoal()">+ Добавить подцель</div>
+            </div>
+
+            <div class="button-group">
+                <button class="btn-secondary" onclick="closeNewGoalModal()">Отмена</button>
+                <button class="btn-primary" onclick="createGoal()">Создать</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentCategory = '';
+        let subgoalCounter = 0;
+        let goals = {
+            spiritual: [],
+            family: [],
+            health: [],
+            personal: [],
+            career: [
+                {
+                    id: 'goal1',
+                    name: 'Завершить проект веб-сайта',
+                    description: 'Создать полнофункциональный веб-сайт для клиента',
+                    deadline: '2024-12-15',
+                    progress: 75,
+                    status: 'active',
+                    subgoals: [
+                        { name: 'Дизайн макетов', completed: true, deadline: '2024-12-01' },
+                        { name: 'Верстка страниц', completed: true, deadline: '2024-12-08' },
+                        { name: 'Программирование функций', completed: false, deadline: '2024-12-12' },
+                        { name: 'Тестирование', completed: false, deadline: '2024-12-14' }
+                    ]
+                },
+                {
+                    id: 'goal2',
+                    name: 'Повышение зарплаты',
+                    description: 'Получить повышение на 30% к концу года',
+                    deadline: '2024-12-31',
+                    progress: 60,
+                    status: 'active',
+                    subgoals: []
+                }
+            ],
+            hobbies: []
+        };
+
+        function openCategory(category) {
+            currentCategory = category;
+            const categoryNames = {
+                spiritual: 'Духовные цели 🙏',
+                family: 'Семья и друзья 👨‍👩‍👧‍👦',
+                health: 'Здоровье 💪',
+                personal: 'Личностный рост 🌱',
+                career: 'Карьера и финансы 💼',
+                hobbies: 'Хобби и отдых 🎨'
+            };
+            
+            document.getElementById('main-view').classList.add('hidden');
+            document.getElementById('category-view').classList.remove('hidden');
+            document.getElementById('categoryTitle').textContent = categoryNames[category];
+            
+            renderGoals();
+        }
+
+        function backToMain() {
+            document.getElementById('category-view').classList.add('hidden');
+            document.getElementById('main-view').classList.remove('hidden');
+            updateBatteryIndicator();
+        }
+
+        function renderGoals() {
+            const goalsList = document.getElementById('goalsList');
+            const categoryGoals = goals[currentCategory] || [];
+            
+            if (categoryGoals.length === 0) {
+                goalsList.innerHTML = '<div style="text-align: center; color: #ccc; padding: 40px;">Пока нет целей в этой категории</div>';
+                return;
+            }
+
+            goalsList.innerHTML = categoryGoals.map(goal => `
+                <div class="goal-item" onclick="openGoalDetails('${goal.id}')">
+                    <div class="goal-header">
+                        <span class="goal-title">${goal.name}</span>
+                        <span class="goal-status ${goal.status === 'completed' ? 'status-completed' : 'status-active'}">
+                            ${goal.status === 'completed' ? 'Завершена' : 'Активна'}
+                        </span>
+                    </div>
+                    <div class="goal-progress">
+                        <div class="progress-fill" style="width: ${goal.progress}%"></div>
+                    </div>
+                    <div style="color: #ccc; font-size: 0.9rem;">
+                        ${goal.status === 'completed' ? 'Завершено' : 'Дедлайн'}: ${formatDate(goal.deadline)}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function openNewGoalModal() {
+            document.getElementById('newGoalModal').classList.remove('hidden');
+            document.getElementById('subgoalsList').innerHTML = '';
+            subgoalCounter = 0;
+        }
+
+        function closeNewGoalModal() {
+            document.getElementById('newGoalModal').classList.add('hidden');
+            document.getElementById('goalName').value = '';
+            document.getElementById('goalDescription').value = '';
+            document.getElementById('goalDeadline').value = '';
+        }
+
+        function closeModalOnBackdrop(event) {
+            if (event.target === event.currentTarget) {
+                closeNewGoalModal();
+            }
+        }
+
+        function addSubgoal() {
+            subgoalCounter++;
+            const subgoalsList = document.getElementById('subgoalsList');
+            const subgoalDiv = document.createElement('div');
+            subgoalDiv.className = 'subgoal-item';
+            subgoalDiv.innerHTML = `
+                <div style="flex: 1; margin-right: 10px;">
+                    <input type="text" class="form-input" placeholder="Название подцели" style="margin-bottom: 5px;">
+                    <input type="date" class="form-input" style="font-size: 0.8rem;">
+                </div>
+                <button onclick="this.parentElement.remove()" style="background: #ff4444; border: none; color: white; padding: 5px 10px; border-radius: 5px; cursor: pointer;">×</button>
+            `;
+            subgoalsList.appendChild(subgoalDiv);
+        }
+
+        function createGoal() {
+            const name = document.getElementById('goalName').value;
+            const description = document.getElementById('goalDescription').value;
+            const deadline = document.getElementById('goalDeadline').value;
+            
+            if (!name || !deadline) {
+                alert('Пожалуйста, заполните название и дедлайн цели');
+                return;
+            }
+
+            const subgoals = [];
+            const subgoalItems = document.querySelectorAll('#subgoalsList .subgoal-item');
+            subgoalItems.forEach(item => {
+                const nameInput = item.querySelector('input[type="text"]');
+                const dateInput = item.querySelector('input[type="date"]');
+                if (nameInput.value) {
+                    subgoals.push({
+                        name: nameInput.value,
+                        completed: false,
+                        deadline: dateInput.value || deadline
+                    });
+                }
+            });
+
+            const newGoal = {
+                id: 'goal_' + Date.now(),
+                name: name,
+                description: description,
+                deadline: deadline,
+                progress: 0,
+                status: 'active',
+                subgoals: subgoals
+            };
+
+            if (!goals[currentCategory]) {
+                goals[currentCategory] = [];
+            }
+            goals[currentCategory].push(newGoal);
+
+            closeNewGoalModal();
+            renderGoals();
+            updateBatteryIndicator();
+            
+            // Показываем уведомление
+            showNotification('Цель успешно создана! 🎯');
+        }
+
+        function openGoalDetails(goalId) {
+            // Находим цель во всех категориях
+            let targetGoal = null;
+            let targetCategory = null;
+            
+            Object.keys(goals).forEach(category => {
+                const goal = goals[category].find(g => g.id === goalId);
+                if (goal) {
+                    targetGoal = goal;
+                    targetCategory = category;
+                }
+            });
+            
+            if (!targetGoal) return;
+            
+            // Создаем модальное окно с деталями цели
+            const modal = document.createElement('div');
+            modal.className = 'modal';
+            modal.onclick = (e) => { if (e.target === modal) modal.remove(); };
+            
+            modal.innerHTML = `
+                <div class="modal-content" onclick="event.stopPropagation()">
+                    <h3 class="modal-title">${targetGoal.name}</h3>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Описание</label>
+                        <p style="color: #ccc; padding: 10px; background: rgba(0,0,0,0.3); border-radius: 8px;">
+                            ${targetGoal.description || 'Описание не указано'}
+                        </p>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Прогресс: ${targetGoal.progress}%</label>
+                        <div class="goal-progress" style="margin: 10px 0;">
+                            <div class="progress-fill" style="width: ${targetGoal.progress}%"></div>
+                        </div>
+                        <input type="range" min="0" max="100" value="${targetGoal.progress}" 
+                               onchange="updateGoalProgress('${goalId}', this.value)"
+                               style="width: 100%; margin: 10px 0;">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Дедлайн</label>
+                        <p style="color: #ff8c00; font-weight: bold;">${formatDate(targetGoal.deadline)}</p>
+                    </div>
+                    
+                    ${targetGoal.subgoals && targetGoal.subgoals.length > 0 ? `
+                        <div class="subgoals-section">
+                            <h4 class="section-title">Подцели</h4>
+                            ${targetGoal.subgoals.map((subgoal, index) => `
+                                <div class="subgoal-item">
+                                    <label style="display: flex; align-items: center; cursor: pointer;">
+                                        <input type="checkbox" ${subgoal.completed ? 'checked' : ''} 
+                                               onchange="toggleSubgoal('${goalId}', ${index})"
+                                               style="margin-right: 10px;">
+                                        <span style="${subgoal.completed ? 'text-decoration: line-through; opacity: 0.6;' : ''}">${subgoal.name}</span>
+                                    </label>
+                                </div>
+                            `).join('')}
+                        </div>
+                    ` : ''}
+                    
+                    <div class="button-group">
+                        <button class="btn-secondary" onclick="this.closest('.modal').remove()">Закрыть</button>
+                        <button class="btn-primary" onclick="markGoalCompleted('${goalId}')">
+                            ${targetGoal.status === 'completed' ? 'Цель завершена' : 'Завершить цель'}
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+        }
+
+        function updateBatteryIndicator() {
+            let totalGoals = 0;
+            let completedGoals = 0;
+            
+            Object.values(goals).forEach(categoryGoals => {
+                categoryGoals.forEach(goal => {
+                    totalGoals++;
+                    if (goal.status === 'completed') {
+                        completedGoals++;
+                    }
+                });
+            });
+
+            const percentage = totalGoals > 0 ? (completedGoals / totalGoals) * 100 : 0;
+            document.getElementById('batteryFill').style.width = percentage + '%';
+            document.getElementById('completedCount').textContent = completedGoals;
+            document.getElementById('totalCount').textContent = totalGoals;
+            
+            // Обновляем счетчики категорий и горящие сроки
+            updateCategoryCounts();
+            updateUrgentGoals();
+        }
+
+        function updateCategoryCounts() {
+            const categories = ['spiritual', 'family', 'health', 'personal', 'career', 'hobbies'];
+            
+            categories.forEach(category => {
+                const count = goals[category] ? goals[category].length : 0;
+                const countElement = document.getElementById(category + '-count');
+                if (countElement) {
+                    countElement.textContent = count === 0 ? '0 целей' : 
+                                             count === 1 ? '1 цель' : 
+                                             count < 5 ? count + ' цели' : 
+                                             count + ' целей';
+                }
+            });
+        }
+
+        function updateUrgentGoals() {
+            const urgentGoalsContainer = document.getElementById('urgentGoals');
+            const urgentSection = document.getElementById('urgentSection');
+            const today = new Date();
+            const urgentGoals = [];
+
+            // Собираем все цели с близкими дедлайнами (в течение 7 дней)
+            Object.values(goals).forEach(categoryGoals => {
+                categoryGoals.forEach(goal => {
+                    if (goal.status === 'active') {
+                        const deadline = new Date(goal.deadline);
+                        const timeDiff = deadline.getTime() - today.getTime();
+                        const daysDiff = Math.ceil(timeDiff / (1000 * 3600 * 24));
+                        
+                        if (daysDiff <= 7 && daysDiff >= 0) {
+                            urgentGoals.push({
+                                name: goal.name,
+                                days: daysDiff
+                            });
+                        }
+                    }
+                });
+            });
+
+            // Сортируем по количеству дней
+            urgentGoals.sort((a, b) => a.days - b.days);
+
+            if (urgentGoals.length === 0) {
+                urgentSection.style.display = 'none';
+            } else {
+                urgentSection.style.display = 'block';
+                urgentGoalsContainer.innerHTML = urgentGoals.map(goal => `
+                    <div class="urgent-goal">
+                        <span class="goal-name">${goal.name}</span>
+                        <span class="deadline">${goal.days === 0 ? 'Сегодня!' : goal.days === 1 ? '1 день' : goal.days + ' дня'}</span>
+                    </div>
+                `).join('');
+            }
+        }
+
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('ru-RU', {
+                day: 'numeric',
+                month: 'long',
+                year: 'numeric'
+            });
+        }
+
+        function showNotification(message) {
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: linear-gradient(45deg, #ff8c00, #ffaa00);
+                color: black;
+                padding: 15px 20px;
+                border-radius: 10px;
+                font-weight: bold;
+                z-index: 2000;
+                animation: slideIn 0.3s ease;
+                box-shadow: 0 5px 15px rgba(255, 140, 0, 0.3);
+            `;
+            notification.textContent = message;
+            document.body.appendChild(notification);
+
+            setTimeout(() => {
+                notification.style.animation = 'slideOut 0.3s ease';
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+        }
+
+        // Добавляем CSS для анимаций уведомлений
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideIn {
+                from { transform: translateX(100%); opacity: 0; }
+                to { transform: translateX(0); opacity: 1; }
+            }
+            @keyframes slideOut {
+                from { transform: translateX(0); opacity: 1; }
+                to { transform: translateX(100%); opacity: 0; }
+            }
+        `;
+        document.head.appendChild(style);
+
+        function updateGoalProgress(goalId, newProgress) {
+            Object.keys(goals).forEach(category => {
+                const goal = goals[category].find(g => g.id === goalId);
+                if (goal) {
+                    goal.progress = parseInt(newProgress);
+                    // Обновляем прогресс-бар в модальном окне
+                    const progressFill = document.querySelector('.modal .progress-fill');
+                    if (progressFill) {
+                        progressFill.style.width = newProgress + '%';
+                    }
+                    // Обновляем текст прогресса
+                    const progressLabel = document.querySelector('.modal .form-label');
+                    if (progressLabel && progressLabel.textContent.includes('Прогресс:')) {
+                        progressLabel.textContent = `Прогресс: ${newProgress}%`;
+                    }
+                    renderGoals();
+                    updateBatteryIndicator();
+                }
+            });
+        }
+
+        function toggleSubgoal(goalId, subgoalIndex) {
+            Object.keys(goals).forEach(category => {
+                const goal = goals[category].find(g => g.id === goalId);
+                if (goal && goal.subgoals[subgoalIndex]) {
+                    goal.subgoals[subgoalIndex].completed = !goal.subgoals[subgoalIndex].completed;
+                    
+                    // Автоматически обновляем прогресс цели на основе подцелей
+                    const completedSubgoals = goal.subgoals.filter(sg => sg.completed).length;
+                    const totalSubgoals = goal.subgoals.length;
+                    if (totalSubgoals > 0) {
+                        goal.progress = Math.round((completedSubgoals / totalSubgoals) * 100);
+                    }
+                    
+                    renderGoals();
+                    updateBatteryIndicator();
+                    showNotification('Подцель обновлена! 📝');
+                }
+            });
+        }
+
+        function markGoalCompleted(goalId) {
+            Object.keys(goals).forEach(category => {
+                const goal = goals[category].find(g => g.id === goalId);
+                if (goal) {
+                    if (goal.status === 'completed') {
+                        showNotification('Цель уже завершена! ✅');
+                        return;
+                    }
+                    
+                    goal.status = 'completed';
+                    goal.progress = 100;
+                    
+                    // Закрываем модальное окно
+                    const modal = document.querySelector('.modal');
+                    if (modal) modal.remove();
+                    
+                    renderGoals();
+                    updateBatteryIndicator();
+                    showNotification('Поздравляем! Цель завершена! 🎉');
+                }
+            });
+        }
+
+        // Массив советов о целях
+        const goalTips = [
+            "💡 Разбивайте большие цели на маленькие шаги - так легче начать!",
+            "🎯 Записывайте свои цели - это увеличивает шансы на успех на 42%!",
+            "⏰ Устанавливайте конкретные дедлайны для каждой цели!",
+            "📊 Отслеживайте прогресс ежедневно - это мотивирует продолжать!",
+            "🔄 Пересматривайте и корректируйте цели каждую неделю!"
+        ];
+
+        const motivationalQuotes = [
+            "Успех - это сумма небольших усилий, повторяемых изо дня в день.",
+            "Цель без плана - это просто желание.",
+            "Не ждите идеального момента. Начните прямо сейчас!",
+            "Каждый день - это новая возможность стать лучше.",
+            "Маленькие шаги каждый день приводят к большим результатам."
+        ];
+
+        function getRandomTip() {
+            return goalTips[Math.floor(Math.random() * goalTips.length)];
+        }
+
+        function getRandomMotivation() {
+            return motivationalQuotes[Math.floor(Math.random() * motivationalQuotes.length)];
+        }
+
+        // Инициализация при загрузке
+        document.addEventListener('DOMContentLoaded', function() {
+            updateBatteryIndicator();
+            
+            // Устанавливаем минимальную дату для дедлайнов
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('goalDeadline').min = today;
+            
+            // Устанавливаем случайный совет и мотивацию
+            document.getElementById('goalTip').textContent = getRandomTip();
+            document.getElementById('dailyMotivation').textContent = getRandomMotivation();
+            
+            showNotification('Добро пожаловать в "Мои цели!" 🚀');
+        });
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'97ac52e9b78feded',t:'MTc1NzE0NDQ4NS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
