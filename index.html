@@ -131,35 +131,6 @@
             box-shadow: 0 10px 30px rgba(255, 140, 0, 0.3);
         }
 
-        .category-card::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: linear-gradient(45deg, transparent, rgba(255, 140, 0, 0.1), transparent);
-            transform: rotate(45deg);
-            transition: all 0.5s ease;
-            opacity: 0;
-        }
-
-        .category-card:hover::before {
-            opacity: 1;
-            animation: shine 0.5s ease;
-        }
-
-        @keyframes shine {
-            0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
-            100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
-        }
-
-        .category-icon {
-            font-size: 2rem;
-            margin-bottom: 10px;
-            display: block;
-        }
-
         .category-name {
             font-weight: bold;
             margin-bottom: 5px;
@@ -565,8 +536,8 @@
                 <div class="main-content">
                     <!-- Индикатор прогресса -->
                     <div class="battery-indicator">
-                        <div class="battery-fill" id="batteryFill" style="width: 35%"></div>
-                        <div class="battery-text">Выполнено: <span id="completedCount">7</span> из <span id="totalCount">20</span> целей</div>
+                        <div class="battery-fill" id="batteryFill" style="width: 0%"></div>
+                        <div class="battery-text">Выполнено: <span id="completedCount">0</span> из <span id="totalCount">0</span> целей</div>
                     </div>
 
                     <!-- Категории целей -->
@@ -589,7 +560,7 @@
                         </div>
                         <div class="category-card" onclick="openCategory('career')">
                             <div class="category-name">Карьера и финансы</div>
-                            <div class="category-count" id="career-count">2 цели</div>
+                            <div class="category-count" id="career-count">0 целей</div>
                         </div>
                         <div class="category-card" onclick="openCategory('hobbies')">
                             <div class="category-name">Хобби и отдых</div>
@@ -597,7 +568,7 @@
                         </div>
                     </div>
 
-                    <!-- Горящие сроки (показывается только если есть) -->
+                    <!-- Горящие сроки -->
                     <div class="motivational-section" id="urgentSection" style="display: none;">
                         <h3 class="section-title">Горящие сроки</h3>
                         <div class="urgent-goals" id="urgentGoals">
@@ -616,40 +587,14 @@
             <div id="category-view">
                 <div class="header">
                     <button class="back-button" onclick="backToMain()">← Назад</button>
-                    <h2 id="categoryTitle" class="app-title" style="font-size: 1.8rem; margin: 10px 0;">Работа</h2>
+                    <h2 id="categoryTitle" class="app-title" style="font-size: 1.8rem; margin: 10px 0;">Категория</h2>
                 </div>
 
                 <div class="category-view">
                     <button class="new-goal-button" onclick="openNewGoalModal()">+ Новая цель</button>
                     
                     <div class="goals-list" id="goalsList">
-                        <div class="goal-item" onclick="openGoalDetails('goal1')">
-                            <div class="delete-background">
-                                Удалить <span class="delete-icon">×</span>
-                            </div>
-                            <div class="goal-header">
-                                <span class="goal-title">Завершить проект веб-сайта</span>
-                                <span class="goal-status status-active">Активна</span>
-                            </div>
-                            <div class="goal-progress">
-                                <div class="progress-fill" style="width: 75%"></div>
-                            </div>
-                            <div style="color: #ccc; font-size: 0.9rem;">Дедлайн: 15 декабря 2024</div>
-                        </div>
-
-                        <div class="goal-item" onclick="openGoalDetails('goal2')">
-                            <div class="delete-background">
-                                Удалить <span class="delete-icon">×</span>
-                            </div>
-                            <div class="goal-header">
-                                <span class="goal-title">Изучить новую технологию</span>
-                                <span class="goal-status status-completed">Завершена</span>
-                            </div>
-                            <div class="goal-progress">
-                                <div class="progress-fill" style="width: 100%"></div>
-                            </div>
-                            <div style="color: #ccc; font-size: 0.9rem;">Завершено: 10 декабря 2024</div>
-                        </div>
+                        <div style="text-align: center; color: #ccc; padding: 40px;">Пока нет целей в этой категории</div>
                     </div>
 
                     <div class="swipe-hint">Потяните цель влево для удаления</div>
@@ -720,57 +665,49 @@
             isSwipping: false
         };
 
-        // Функции сохранения данных
-        function saveData() {
-            localStorage.setItem('goalsApp_data', JSON.stringify(goals));
-            localStorage.setItem('goalsApp_currentCategory', currentCategory);
-        }
-
-        function loadData() {
-            const savedGoals = localStorage.getItem('goalsApp_data');
-            const savedCategory = localStorage.getItem('goalsApp_currentCategory');
-            
-            if (savedGoals) {
-                goals = JSON.parse(savedGoals);
-            }
-            
-            if (savedCategory) {
-                currentCategory = savedCategory;
-            }
-        }
-
         let goals = {
             spiritual: [],
             family: [],
             health: [],
             personal: [],
-            career: [
-                {
-                    id: 'goal1',
-                    name: 'Завершить проект веб-сайта',
-                    description: 'Создать полнофункциональный веб-сайт для клиента',
-                    deadline: '2024-12-15',
-                    progress: 75,
-                    status: 'active',
-                    subgoals: [
-                        { name: 'Дизайн макетов', completed: true, deadline: '2024-12-01' },
-                        { name: 'Верстка страниц', completed: true, deadline: '2024-12-08' },
-                        { name: 'Программирование функций', completed: false, deadline: '2024-12-12' },
-                        { name: 'Тестирование', completed: false, deadline: '2024-12-14' }
-                    ]
-                },
-                {
-                    id: 'goal2',
-                    name: 'Повышение зарплаты',
-                    description: 'Получить повышение на 30% к концу года',
-                    deadline: '2024-12-31',
-                    progress: 60,
-                    status: 'active',
-                    subgoals: []
-                }
-            ],
+            career: [],
             hobbies: []
         };
+
+        // Функции сохранения данных
+        function saveData() {
+            try {
+                localStorage.setItem('goalsApp_data', JSON.stringify(goals));
+                localStorage.setItem('goalsApp_currentCategory', currentCategory);
+            } catch (e) {
+                console.error('Ошибка сохранения данных:', e);
+            }
+        }
+
+        function loadData() {
+            try {
+                const savedGoals = localStorage.getItem('goalsApp_data');
+                const savedCategory = localStorage.getItem('goalsApp_currentCategory');
+                
+                if (savedGoals) {
+                    goals = JSON.parse(savedGoals);
+                }
+                
+                if (savedCategory && savedCategory !== 'null' && savedCategory !== '') {
+                    currentCategory = savedCategory;
+                }
+            } catch (e) {
+                console.error('Ошибка загрузки данных:', e);
+                goals = {
+                    spiritual: [],
+                    family: [],
+                    health: [],
+                    personal: [],
+                    career: [],
+                    hobbies: []
+                };
+            }
+        }
 
         function openCategory(category) {
             currentCategory = category;
@@ -864,6 +801,15 @@
             return match ? parseFloat(match[1]) : 0;
         }
 
+        function calculateGoalProgress(goal) {
+            if (goal.subgoals && goal.subgoals.length > 0) {
+                const completedSubgoals = goal.subgoals.filter(sg => sg.completed).length;
+                return Math.round((completedSubgoals / goal.subgoals.length) * 100);
+            } else {
+                return goal.status === 'completed' ? 100 : 0;
+            }
+        }
+
         function renderGoals() {
             const goalsList = document.getElementById('goalsList');
             const categoryGoals = goals[currentCategory] || [];
@@ -875,15 +821,7 @@
 
             // Обновляем прогресс на основе подцелей
             categoryGoals.forEach(goal => {
-                if (goal.subgoals && goal.subgoals.length > 0) {
-                    const completedSubgoals = goal.subgoals.filter(sg => sg.completed).length;
-                    goal.progress = Math.round((completedSubgoals / goal.subgoals.length) * 100);
-                } else {
-                    // Если нет подцелей, прогресс остается 0, пока цель не завершена
-                    if (goal.status !== 'completed') {
-                        goal.progress = 0;
-                    }
-                }
+                goal.progress = calculateGoalProgress(goal);
             });
 
             goalsList.innerHTML = categoryGoals.map(goal => `
@@ -927,14 +865,8 @@
             element.addEventListener('touchmove', handleMove, { passive: false });
             element.addEventListener('touchend', handleEnd, { passive: true });
 
-            // Mouse события для десктопа
-            element.addEventListener('mousedown', handleStart);
-            element.addEventListener('mousemove', handleMove);
-            element.addEventListener('mouseup', handleEnd);
-            element.addEventListener('mouseleave', handleEnd);
-
             function handleStart(e) {
-                startX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
+                startX = e.touches[0].clientX;
                 currentX = startX;
                 isSwipping = true;
                 element.classList.add('swiping');
@@ -944,7 +876,7 @@
                 if (!isSwipping) return;
                 
                 e.preventDefault();
-                currentX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
+                currentX = e.touches[0].clientX;
                 const deltaX = currentX - startX;
                 
                 // Только свайп влево
@@ -980,7 +912,6 @@
                 element.classList.remove('swiping');
                 
                 const deltaX = currentX - startX;
-                const swipeDistance = Math.abs(deltaX);
                 
                 // Если свайп влево достаточно далеко, показываем подтверждение удаления
                 if (deltaX < -80) {
@@ -1038,13 +969,15 @@
             document.getElementById('newGoalModal').classList.remove('hidden');
             document.getElementById('subgoalsList').innerHTML = '';
             subgoalCounter = 0;
+            
+            // Очищаем форму
+            document.getElementById('goalName').value = '';
+            document.getElementById('goalDescription').value = '';
+            document.getElementById('goalDeadline').value = '';
         }
 
         function closeNewGoalModal() {
             document.getElementById('newGoalModal').classList.add('hidden');
-            document.getElementById('goalName').value = '';
-            document.getElementById('goalDescription').value = '';
-            document.getElementById('goalDeadline').value = '';
         }
 
         function closeModalOnBackdrop(event) {
@@ -1069,8 +1002,8 @@
         }
 
         function createGoal() {
-            const name = document.getElementById('goalName').value;
-            const description = document.getElementById('goalDescription').value;
+            const name = document.getElementById('goalName').value.trim();
+            const description = document.getElementById('goalDescription').value.trim();
             const deadline = document.getElementById('goalDeadline').value;
             
             if (!name || !deadline) {
@@ -1083,9 +1016,9 @@
             subgoalItems.forEach(item => {
                 const nameInput = item.querySelector('input[type="text"]');
                 const dateInput = item.querySelector('input[type="date"]');
-                if (nameInput.value) {
+                if (nameInput.value.trim()) {
                     subgoals.push({
-                        name: nameInput.value,
+                        name: nameInput.value.trim(),
                         completed: false,
                         deadline: dateInput.value || deadline
                     });
@@ -1097,7 +1030,7 @@
                 name: name,
                 description: description,
                 deadline: deadline,
-                progress: subgoals.length > 0 ? 0 : 0, // Прогресс 0% если есть подцели или нет подцелей
+                progress: 0,
                 status: 'active',
                 subgoals: subgoals
             };
@@ -1149,9 +1082,6 @@
                         <div class="goal-progress" style="margin: 10px 0;">
                             <div class="progress-fill" style="width: ${targetGoal.progress}%"></div>
                         </div>
-                        <input type="range" min="0" max="100" value="${targetGoal.progress}" 
-                               onchange="updateGoalProgress('${goalId}', this.value)"
-                               style="width: 100%; margin: 10px 0;">
                     </div>
                     
                     <div class="form-group">
@@ -1177,7 +1107,8 @@
                     
                     <div class="button-group">
                         <button class="btn-secondary" onclick="this.closest('.modal').remove()">Закрыть</button>
-                        <button class="btn-primary" onclick="markGoalCompleted('${goalId}')">
+                        <button class="btn-primary" onclick="markGoalCompleted('${goalId}')" 
+                                ${targetGoal.status === 'completed' ? 'disabled style="opacity: 0.5;"' : ''}>
                             ${targetGoal.status === 'completed' ? 'Цель завершена' : 'Завершить цель'}
                         </button>
                     </div>
@@ -1308,40 +1239,30 @@
         `;
         document.head.appendChild(style);
 
-        function updateGoalProgress(goalId, newProgress) {
-            Object.keys(goals).forEach(category => {
-                const goal = goals[category].find(g => g.id === goalId);
-                if (goal) {
-                    goal.progress = parseInt(newProgress);
-                    const progressFill = document.querySelector('.modal .progress-fill');
-                    if (progressFill) {
-                        progressFill.style.width = newProgress + '%';
-                    }
-                    const progressLabel = document.querySelector('.modal .form-label');
-                    if (progressLabel && progressLabel.textContent.includes('Прогресс:')) {
-                        progressLabel.textContent = `Прогресс: ${newProgress}%`;
-                    }
-                    renderGoals();
-                    updateBatteryIndicator();
-                }
-            });
-        }
-
         function toggleSubgoal(goalId, subgoalIndex) {
             Object.keys(goals).forEach(category => {
                 const goal = goals[category].find(g => g.id === goalId);
                 if (goal && goal.subgoals[subgoalIndex]) {
                     goal.subgoals[subgoalIndex].completed = !goal.subgoals[subgoalIndex].completed;
                     
-                    const completedSubgoals = goal.subgoals.filter(sg => sg.completed).length;
-                    const totalSubgoals = goal.subgoals.length;
-                    if (totalSubgoals > 0) {
-                        goal.progress = Math.round((completedSubgoals / totalSubgoals) * 100);
-                    }
+                    // Пересчитываем прогресс
+                    goal.progress = calculateGoalProgress(goal);
                     
+                    // Обновляем интерфейс
                     renderGoals();
                     updateBatteryIndicator();
                     saveData();
+                    
+                    // Обновляем прогресс в модальном окне
+                    const progressFill = document.querySelector('.modal .progress-fill');
+                    const progressLabel = document.querySelector('.modal .form-label');
+                    if (progressFill) {
+                        progressFill.style.width = goal.progress + '%';
+                    }
+                    if (progressLabel && progressLabel.textContent.includes('Прогресс:')) {
+                        progressLabel.textContent = `Прогресс: ${goal.progress}%`;
+                    }
+                    
                     showNotification('Подцель обновлена!');
                 }
             });
@@ -1358,6 +1279,13 @@
                     
                     goal.status = 'completed';
                     goal.progress = 100;
+                    
+                    // Отмечаем все подцели как завершенные
+                    if (goal.subgoals) {
+                        goal.subgoals.forEach(subgoal => {
+                            subgoal.completed = true;
+                        });
+                    }
                     
                     const modal = document.querySelector('.modal');
                     if (modal) modal.remove();
@@ -1406,7 +1334,7 @@
             document.getElementById('dailyMotivation').textContent = getRandomMotivation();
             
             // Восстанавливаем состояние экрана если была открыта категория
-            if (currentCategory) {
+            if (currentCategory && currentCategory !== '') {
                 const categoryNames = {
                     spiritual: 'Духовные цели',
                     family: 'Семья и друзья',
@@ -1423,5 +1351,5 @@
             showNotification('Добро пожаловать в "Мои цели!"');
         });
     </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'97ac6aaa94119243',t:'MTc1NzE0NTQ1OC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'97ac726e6238373c',t:'MTc1NzE0NTc3Ni4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
