@@ -26,24 +26,29 @@
             position: relative;
             background: rgba(0, 0, 0, 0.8);
             box-shadow: 0 0 50px rgba(255, 140, 0, 0.1);
-            overflow: hidden;
+            overflow: visible;
         }
 
-        .view-container {
-            display: flex;
-            width: 200%;
-            height: 100vh;
-            transition: transform 0.3s ease;
-        }
-
-        .view-container.swiping {
-            transition: none;
-        }
-
-        #main-view, #category-view {
-            width: 50%;
+        #main-view {
             min-height: 100vh;
-            flex-shrink: 0;
+            overflow-y: auto;
+        }
+
+        #category-view {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+            z-index: 100;
+            transform: translateX(100%);
+            transition: transform 0.3s ease;
+            overflow-y: auto;
+        }
+
+        #category-view.active {
+            transform: translateX(0);
         }
 
         .header {
@@ -74,6 +79,7 @@
 
         .main-content {
             padding: 20px;
+            padding-bottom: 60px;
         }
 
         .battery-indicator {
@@ -523,9 +529,8 @@
 </head>
 <body>
     <div class="app-container">
-        <div class="view-container" id="viewContainer">
-            <!-- Главное меню -->
-            <div id="main-view">
+        <!-- Главное меню -->
+        <div id="main-view">
                 <div class="header">
                     <h1 class="app-title">Мои цели!</h1>
                     <p style="color: #8b949e; font-size: 0.9rem; margin-top: 10px; font-style: italic;" id="goalTip">Разбивайте большие цели на маленькие шаги - так легче начать!</p>
@@ -579,10 +584,10 @@
                         <p class="motivation-text" id="dailyMotivation">"Успех - это сумма небольших усилий, повторяемых изо дня в день."</p>
                     </div>
                 </div>
-            </div>
+        </div>
 
-            <!-- Вид категории -->
-            <div id="category-view">
+        <!-- Вид категории -->
+        <div id="category-view">
                 <div class="header">
                     <button class="back-button" onclick="backToMain()">← Назад</button>
                     <h2 id="categoryTitle" class="app-title" style="font-size: 1.8rem; margin: 10px 0;">Категория</h2>
@@ -597,7 +602,6 @@
 
                     <div class="swipe-hint">Потяните цель влево для удаления</div>
                 </div>
-            </div>
         </div>
     </div>
 
@@ -671,7 +675,7 @@
         function saveData() {
             try {
                 localStorage.setItem('goalsApp_data', JSON.stringify(goals));
-                localStorage.setItem('goalsApp_currentCategory', currentCategory);
+                // Не сохраняем текущую категорию - всегда начинаем с главного экрана
             } catch (e) {
                 console.error('Ошибка сохранения данных:', e);
             }
@@ -680,15 +684,13 @@
         function loadData() {
             try {
                 const savedGoals = localStorage.getItem('goalsApp_data');
-                const savedCategory = localStorage.getItem('goalsApp_currentCategory');
                 
                 if (savedGoals) {
                     goals = JSON.parse(savedGoals);
                 }
                 
-                if (savedCategory && savedCategory !== 'null' && savedCategory !== '') {
-                    currentCategory = savedCategory;
-                }
+                // Всегда начинаем с главного экрана
+                currentCategory = '';
             } catch (e) {
                 console.error('Ошибка загрузки данных:', e);
                 goals = {
@@ -699,6 +701,7 @@
                     career: [],
                     hobbies: []
                 };
+                currentCategory = '';
             }
         }
 
@@ -713,18 +716,16 @@
                 hobbies: 'Хобби и отдых'
             };
             
-            document.getElementById('viewContainer').style.transform = 'translateX(-50%)';
+            document.getElementById('category-view').classList.add('active');
             document.getElementById('categoryTitle').textContent = categoryNames[category];
             
             renderGoals();
-            saveData();
         }
 
         function backToMain() {
-            document.getElementById('viewContainer').style.transform = 'translateX(0%)';
+            document.getElementById('category-view').classList.remove('active');
             updateBatteryIndicator();
             currentCategory = '';
-            saveData();
         }
 
         // Функции свайпа между экранами убраны для лучшей прокрутки
@@ -1035,10 +1036,12 @@
                     
                     <div class="button-group">
                         <button class="btn-secondary" onclick="this.closest('.modal').remove()">Закрыть</button>
-                        <button class="btn-primary" onclick="markGoalCompleted('${goalId}')" 
-                                ${targetGoal.status === 'completed' ? 'disabled style="opacity: 0.5;"' : ''}>
-                            ${targetGoal.status === 'completed' ? 'Цель завершена' : 'Завершить цель'}
-                        </button>
+                        ${targetGoal.subgoals && targetGoal.subgoals.length > 0 ? '' : `
+                            <button class="btn-primary" onclick="markGoalCompleted('${goalId}')" 
+                                    ${targetGoal.status === 'completed' ? 'disabled style="opacity: 0.5;"' : ''}>
+                                ${targetGoal.status === 'completed' ? 'Цель завершена' : 'Завершить цель'}
+                            </button>
+                        `}
                     </div>
                 </div>
             `;
@@ -1176,6 +1179,20 @@
                     // Пересчитываем прогресс
                     goal.progress = calculateGoalProgress(goal);
                     
+                    // Проверяем, все ли подцели выполнены
+                    const allSubgoalsCompleted = goal.subgoals.every(subgoal => subgoal.completed);
+                    if (allSubgoalsCompleted && goal.status !== 'completed') {
+                        goal.status = 'completed';
+                        goal.progress = 100;
+                        showNotification('Поздравляем! Цель автоматически завершена!');
+                        
+                        // Закрываем модальное окно если оно открыто
+                        const modal = document.querySelector('.modal');
+                        if (modal) modal.remove();
+                    } else if (!allSubgoalsCompleted && goal.status === 'completed') {
+                        goal.status = 'active';
+                    }
+                    
                     // Обновляем интерфейс
                     renderGoals();
                     updateBatteryIndicator();
@@ -1191,7 +1208,9 @@
                         progressLabel.textContent = `Прогресс: ${goal.progress}%`;
                     }
                     
-                    showNotification('Подцель обновлена!');
+                    if (!allSubgoalsCompleted || goal.status !== 'completed') {
+                        showNotification('Подцель обновлена!');
+                    }
                 }
             });
         }
@@ -1260,23 +1279,12 @@
             document.getElementById('goalTip').textContent = getRandomTip();
             document.getElementById('dailyMotivation').textContent = getRandomMotivation();
             
-            // Восстанавливаем состояние экрана если была открыта категория
-            if (currentCategory && currentCategory !== '') {
-                const categoryNames = {
-                    spiritual: 'Духовные цели',
-                    family: 'Семья и друзья',
-                    health: 'Здоровье',
-                    personal: 'Личностный рост',
-                    career: 'Карьера и финансы',
-                    hobbies: 'Хобби и отдых'
-                };
-                document.getElementById('viewContainer').style.transform = 'translateX(-50%)';
-                document.getElementById('categoryTitle').textContent = categoryNames[currentCategory];
-                renderGoals();
-            }
+            // Всегда начинаем с главного экрана
+            currentCategory = '';
+            document.getElementById('category-view').classList.remove('active');
             
             showNotification('Добро пожаловать в "Мои цели!"');
         });
     </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'97ac780d82c9d22e',t:'MTc1NzE0NjAwNi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'97ac83bba31ad22e',t:'MTc1NzE0NjQ4NS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
