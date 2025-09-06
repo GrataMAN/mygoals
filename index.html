@@ -227,6 +227,28 @@
             transform: scale(1.05);
         }
 
+        .back-button-bottom {
+            background: rgba(255, 140, 0, 0.2);
+            border: 2px solid #ff8c00;
+            color: #ff8c00;
+            padding: 15px 30px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1.1rem;
+            width: 100%;
+            margin-top: 30px;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .back-button-bottom:hover {
+            background: #ff8c00;
+            color: black;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 140, 0, 0.3);
+        }
+
         .new-goal-button {
             background: linear-gradient(45deg, #ff8c00, #ffaa00);
             border: none;
@@ -589,8 +611,7 @@
         <!-- Вид категории -->
         <div id="category-view">
                 <div class="header">
-                    <button class="back-button" onclick="backToMain()">← Назад</button>
-                    <h2 id="categoryTitle" class="app-title" style="font-size: 1.8rem; margin: 10px 0;">Категория</h2>
+                    <h2 id="categoryTitle" class="app-title" style="font-size: 1.8rem; margin: 20px 0;">Категория</h2>
                 </div>
 
                 <div class="category-view">
@@ -601,6 +622,8 @@
                     </div>
 
                     <div class="swipe-hint">Потяните цель влево для удаления</div>
+                    
+                    <button class="back-button-bottom" onclick="backToMain()">← Назад</button>
                 </div>
         </div>
     </div>
@@ -1286,5 +1309,5 @@
             showNotification('Добро пожаловать в "Мои цели!"');
         });
     </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'97ac83bba31ad22e',t:'MTc1NzE0NjQ4NS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'97ac8a55a24edcb5',t:'MTc1NzE0Njc1NS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
