@@ -26,6 +26,25 @@
             position: relative;
             background: rgba(0, 0, 0, 0.8);
             box-shadow: 0 0 50px rgba(255, 140, 0, 0.1);
+            overflow: hidden;
+            touch-action: pan-y;
+        }
+
+        .view-container {
+            display: flex;
+            width: 200%;
+            height: 100vh;
+            transition: transform 0.3s ease;
+        }
+
+        .view-container.swiping {
+            transition: none;
+        }
+
+        #main-view, #category-view {
+            width: 50%;
+            min-height: 100vh;
+            flex-shrink: 0;
         }
 
         .header {
@@ -264,11 +283,58 @@
             margin-bottom: 15px;
             cursor: pointer;
             transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            touch-action: pan-y;
         }
 
         .goal-item:hover {
             background: rgba(255, 140, 0, 0.2);
             transform: translateX(5px);
+        }
+
+        .goal-item.swiping {
+            transition: none;
+        }
+
+        .goal-item.deleting {
+            animation: slideOutRight 0.3s ease forwards;
+        }
+
+        @keyframes slideOutRight {
+            to {
+                transform: translateX(100%);
+                opacity: 0;
+                height: 0;
+                margin: 0;
+                padding: 0;
+            }
+        }
+
+        .delete-background {
+            position: absolute;
+            top: 0;
+            right: 0;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, #ff4444);
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding-right: 20px;
+            color: white;
+            font-weight: bold;
+            border-radius: 0 10px 10px 0;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+
+        .delete-background.visible {
+            opacity: 1;
+        }
+
+        .delete-icon {
+            font-size: 1.5rem;
+            margin-left: 10px;
         }
 
         .goal-header {
@@ -413,7 +479,19 @@
             transition: all 0.3s ease;
         }
 
-        .btn-primary:hover, .btn-secondary:hover {
+        .btn-danger {
+            flex: 1;
+            background: linear-gradient(45deg, #ff4444, #ff6666);
+            border: none;
+            color: white;
+            padding: 12px;
+            border-radius: 10px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover, .btn-secondary:hover, .btn-danger:hover {
             transform: translateY(-2px);
         }
 
@@ -450,6 +528,14 @@
             background: rgba(255, 140, 0, 0.3);
         }
 
+        .swipe-hint {
+            color: #888;
+            font-size: 0.8rem;
+            text-align: center;
+            margin-top: 20px;
+            font-style: italic;
+        }
+
         @media (max-width: 480px) {
             .app-title {
                 font-size: 2rem;
@@ -468,101 +554,105 @@
 </head>
 <body>
     <div class="app-container">
-        <!-- Главное меню -->
-        <div id="main-view">
-            <div class="header">
-                <h1 class="app-title">Мои цели!</h1>
-                <p style="color: #8b949e; font-size: 0.9rem; margin-top: 10px; font-style: italic;" id="goalTip">💡 Разбивайте большие цели на маленькие шаги - так легче начать!</p>
-            </div>
-
-            <div class="main-content">
-                <!-- Индикатор прогресса -->
-                <div class="battery-indicator">
-                    <div class="battery-fill" id="batteryFill" style="width: 35%"></div>
-                    <div class="battery-text">Выполнено: <span id="completedCount">7</span> из <span id="totalCount">20</span> целей</div>
+        <div class="view-container" id="viewContainer">
+            <!-- Главное меню -->
+            <div id="main-view">
+                <div class="header">
+                    <h1 class="app-title">Мои цели!</h1>
+                    <p style="color: #8b949e; font-size: 0.9rem; margin-top: 10px; font-style: italic;" id="goalTip">Разбивайте большие цели на маленькие шаги - так легче начать!</p>
                 </div>
 
-                <!-- Категории целей -->
-                <div class="categories-grid">
-                    <div class="category-card" onclick="openCategory('spiritual')">
-                        <span class="category-icon">🙏</span>
-                        <div class="category-name">Духовные цели</div>
-                        <div class="category-count" id="spiritual-count">0 целей</div>
+                <div class="main-content">
+                    <!-- Индикатор прогресса -->
+                    <div class="battery-indicator">
+                        <div class="battery-fill" id="batteryFill" style="width: 35%"></div>
+                        <div class="battery-text">Выполнено: <span id="completedCount">7</span> из <span id="totalCount">20</span> целей</div>
                     </div>
-                    <div class="category-card" onclick="openCategory('family')">
-                        <span class="category-icon">👨‍👩‍👧‍👦</span>
-                        <div class="category-name">Семья и друзья</div>
-                        <div class="category-count" id="family-count">0 целей</div>
-                    </div>
-                    <div class="category-card" onclick="openCategory('health')">
-                        <span class="category-icon">💪</span>
-                        <div class="category-name">Здоровье</div>
-                        <div class="category-count" id="health-count">0 целей</div>
-                    </div>
-                    <div class="category-card" onclick="openCategory('personal')">
-                        <span class="category-icon">🌱</span>
-                        <div class="category-name">Личностный рост</div>
-                        <div class="category-count" id="personal-count">0 целей</div>
-                    </div>
-                    <div class="category-card" onclick="openCategory('career')">
-                        <span class="category-icon">💼</span>
-                        <div class="category-name">Карьера и финансы</div>
-                        <div class="category-count" id="career-count">2 цели</div>
-                    </div>
-                    <div class="category-card" onclick="openCategory('hobbies')">
-                        <span class="category-icon">🎨</span>
-                        <div class="category-name">Хобби и отдых</div>
-                        <div class="category-count" id="hobbies-count">0 целей</div>
-                    </div>
-                </div>
 
-                <!-- Горящие сроки (показывается только если есть) -->
-                <div class="motivational-section" id="urgentSection" style="display: none;">
-                    <h3 class="section-title">🔥 Горящие сроки</h3>
-                    <div class="urgent-goals" id="urgentGoals">
+                    <!-- Категории целей -->
+                    <div class="categories-grid">
+                        <div class="category-card" onclick="openCategory('spiritual')">
+                            <div class="category-name">Духовные цели</div>
+                            <div class="category-count" id="spiritual-count">0 целей</div>
+                        </div>
+                        <div class="category-card" onclick="openCategory('family')">
+                            <div class="category-name">Семья и друзья</div>
+                            <div class="category-count" id="family-count">0 целей</div>
+                        </div>
+                        <div class="category-card" onclick="openCategory('health')">
+                            <div class="category-name">Здоровье</div>
+                            <div class="category-count" id="health-count">0 целей</div>
+                        </div>
+                        <div class="category-card" onclick="openCategory('personal')">
+                            <div class="category-name">Личностный рост</div>
+                            <div class="category-count" id="personal-count">0 целей</div>
+                        </div>
+                        <div class="category-card" onclick="openCategory('career')">
+                            <div class="category-name">Карьера и финансы</div>
+                            <div class="category-count" id="career-count">2 цели</div>
+                        </div>
+                        <div class="category-card" onclick="openCategory('hobbies')">
+                            <div class="category-name">Хобби и отдых</div>
+                            <div class="category-count" id="hobbies-count">0 целей</div>
+                        </div>
                     </div>
-                </div>
 
-                <!-- Мотивация дня -->
-                <div class="motivational-section" style="margin-bottom: 20px;">
-                    <h3 class="section-title">💡 Мотивация дня</h3>
-                    <p class="motivation-text" id="dailyMotivation">"Успех - это сумма небольших усилий, повторяемых изо дня в день."</p>
+                    <!-- Горящие сроки (показывается только если есть) -->
+                    <div class="motivational-section" id="urgentSection" style="display: none;">
+                        <h3 class="section-title">Горящие сроки</h3>
+                        <div class="urgent-goals" id="urgentGoals">
+                        </div>
+                    </div>
+
+                    <!-- Мотивация дня -->
+                    <div class="motivational-section" style="margin-bottom: 20px;">
+                        <h3 class="section-title">Мотивация дня</h3>
+                        <p class="motivation-text" id="dailyMotivation">"Успех - это сумма небольших усилий, повторяемых изо дня в день."</p>
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <!-- Вид категории -->
-        <div id="category-view" class="hidden">
-            <div class="header">
-                <button class="back-button" onclick="backToMain()">← Назад</button>
-                <h2 id="categoryTitle" class="app-title" style="font-size: 1.8rem; margin: 10px 0;">Работа</h2>
-            </div>
+            <!-- Вид категории -->
+            <div id="category-view">
+                <div class="header">
+                    <button class="back-button" onclick="backToMain()">← Назад</button>
+                    <h2 id="categoryTitle" class="app-title" style="font-size: 1.8rem; margin: 10px 0;">Работа</h2>
+                </div>
 
-            <div class="category-view">
-                <button class="new-goal-button" onclick="openNewGoalModal()">+ Новая цель</button>
-                
-                <div class="goals-list" id="goalsList">
-                    <div class="goal-item" onclick="openGoalDetails('goal1')">
-                        <div class="goal-header">
-                            <span class="goal-title">Завершить проект веб-сайта</span>
-                            <span class="goal-status status-active">Активна</span>
+                <div class="category-view">
+                    <button class="new-goal-button" onclick="openNewGoalModal()">+ Новая цель</button>
+                    
+                    <div class="goals-list" id="goalsList">
+                        <div class="goal-item" onclick="openGoalDetails('goal1')">
+                            <div class="delete-background">
+                                Удалить <span class="delete-icon">×</span>
+                            </div>
+                            <div class="goal-header">
+                                <span class="goal-title">Завершить проект веб-сайта</span>
+                                <span class="goal-status status-active">Активна</span>
+                            </div>
+                            <div class="goal-progress">
+                                <div class="progress-fill" style="width: 75%"></div>
+                            </div>
+                            <div style="color: #ccc; font-size: 0.9rem;">Дедлайн: 15 декабря 2024</div>
                         </div>
-                        <div class="goal-progress">
-                            <div class="progress-fill" style="width: 75%"></div>
+
+                        <div class="goal-item" onclick="openGoalDetails('goal2')">
+                            <div class="delete-background">
+                                Удалить <span class="delete-icon">×</span>
+                            </div>
+                            <div class="goal-header">
+                                <span class="goal-title">Изучить новую технологию</span>
+                                <span class="goal-status status-completed">Завершена</span>
+                            </div>
+                            <div class="goal-progress">
+                                <div class="progress-fill" style="width: 100%"></div>
+                            </div>
+                            <div style="color: #ccc; font-size: 0.9rem;">Завершено: 10 декабря 2024</div>
                         </div>
-                        <div style="color: #ccc; font-size: 0.9rem;">Дедлайн: 15 декабря 2024</div>
                     </div>
 
-                    <div class="goal-item" onclick="openGoalDetails('goal2')">
-                        <div class="goal-header">
-                            <span class="goal-title">Изучить новую технологию</span>
-                            <span class="goal-status status-completed">Завершена</span>
-                        </div>
-                        <div class="goal-progress">
-                            <div class="progress-fill" style="width: 100%"></div>
-                        </div>
-                        <div style="color: #ccc; font-size: 0.9rem;">Завершено: 10 декабря 2024</div>
-                    </div>
+                    <div class="swipe-hint">Потяните цель влево для удаления</div>
                 </div>
             </div>
         </div>
@@ -603,9 +693,52 @@
         </div>
     </div>
 
+    <!-- Модальное окно подтверждения удаления -->
+    <div id="deleteConfirmModal" class="modal hidden">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <h3 class="modal-title">Удалить цель?</h3>
+            <p style="color: #ccc; text-align: center; margin: 20px 0;">
+                Вы уверены, что хотите удалить цель "<span id="deleteGoalName"></span>"?
+            </p>
+            <p style="color: #ff8c00; text-align: center; font-size: 0.9rem; margin-bottom: 20px;">
+                Это действие нельзя отменить.
+            </p>
+            <div class="button-group">
+                <button class="btn-secondary" onclick="cancelDelete()">Отмена</button>
+                <button class="btn-danger" onclick="confirmDelete()">Удалить</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         let currentCategory = '';
         let subgoalCounter = 0;
+        let goalToDelete = null;
+        let viewSwipeData = {
+            startX: 0,
+            currentX: 0,
+            isSwipping: false
+        };
+
+        // Функции сохранения данных
+        function saveData() {
+            localStorage.setItem('goalsApp_data', JSON.stringify(goals));
+            localStorage.setItem('goalsApp_currentCategory', currentCategory);
+        }
+
+        function loadData() {
+            const savedGoals = localStorage.getItem('goalsApp_data');
+            const savedCategory = localStorage.getItem('goalsApp_currentCategory');
+            
+            if (savedGoals) {
+                goals = JSON.parse(savedGoals);
+            }
+            
+            if (savedCategory) {
+                currentCategory = savedCategory;
+            }
+        }
+
         let goals = {
             spiritual: [],
             family: [],
@@ -642,25 +775,93 @@
         function openCategory(category) {
             currentCategory = category;
             const categoryNames = {
-                spiritual: 'Духовные цели 🙏',
-                family: 'Семья и друзья 👨‍👩‍👧‍👦',
-                health: 'Здоровье 💪',
-                personal: 'Личностный рост 🌱',
-                career: 'Карьера и финансы 💼',
-                hobbies: 'Хобби и отдых 🎨'
+                spiritual: 'Духовные цели',
+                family: 'Семья и друзья',
+                health: 'Здоровье',
+                personal: 'Личностный рост',
+                career: 'Карьера и финансы',
+                hobbies: 'Хобби и отдых'
             };
             
-            document.getElementById('main-view').classList.add('hidden');
-            document.getElementById('category-view').classList.remove('hidden');
+            document.getElementById('viewContainer').style.transform = 'translateX(-50%)';
             document.getElementById('categoryTitle').textContent = categoryNames[category];
             
             renderGoals();
+            saveData();
         }
 
         function backToMain() {
-            document.getElementById('category-view').classList.add('hidden');
-            document.getElementById('main-view').classList.remove('hidden');
+            document.getElementById('viewContainer').style.transform = 'translateX(0%)';
             updateBatteryIndicator();
+            currentCategory = '';
+            saveData();
+        }
+
+        // Функции свайпа между экранами
+        function setupViewSwipe() {
+            const viewContainer = document.getElementById('viewContainer');
+            
+            viewContainer.addEventListener('touchstart', handleViewSwipeStart, { passive: true });
+            viewContainer.addEventListener('touchmove', handleViewSwipeMove, { passive: false });
+            viewContainer.addEventListener('touchend', handleViewSwipeEnd, { passive: true });
+        }
+
+        function handleViewSwipeStart(e) {
+            viewSwipeData.startX = e.touches[0].clientX;
+            viewSwipeData.currentX = viewSwipeData.startX;
+            viewSwipeData.isSwipping = true;
+            document.getElementById('viewContainer').classList.add('swiping');
+        }
+
+        function handleViewSwipeMove(e) {
+            if (!viewSwipeData.isSwipping) return;
+            
+            e.preventDefault();
+            viewSwipeData.currentX = e.touches[0].clientX;
+            const deltaX = viewSwipeData.currentX - viewSwipeData.startX;
+            
+            const currentTransform = getCurrentTransform();
+            let newTransform = currentTransform + (deltaX / window.innerWidth) * 50;
+            
+            // Ограничиваем движение
+            newTransform = Math.max(-50, Math.min(0, newTransform));
+            
+            document.getElementById('viewContainer').style.transform = `translateX(${newTransform}%)`;
+        }
+
+        function handleViewSwipeEnd(e) {
+            if (!viewSwipeData.isSwipping) return;
+            
+            viewSwipeData.isSwipping = false;
+            document.getElementById('viewContainer').classList.remove('swiping');
+            
+            const deltaX = viewSwipeData.currentX - viewSwipeData.startX;
+            const threshold = 100;
+            
+            const currentTransform = getCurrentTransform();
+            
+            if (Math.abs(deltaX) > threshold) {
+                if (deltaX > 0 && currentTransform < 0) {
+                    // Свайп вправо - возврат к главному меню
+                    backToMain();
+                } else if (deltaX < 0 && currentTransform >= 0 && currentCategory) {
+                    // Свайп влево - переход к категории (если есть активная)
+                    document.getElementById('viewContainer').style.transform = 'translateX(-50%)';
+                }
+            } else {
+                // Возврат к текущему состоянию
+                if (currentTransform < -25) {
+                    document.getElementById('viewContainer').style.transform = 'translateX(-50%)';
+                } else {
+                    document.getElementById('viewContainer').style.transform = 'translateX(0%)';
+                }
+            }
+        }
+
+        function getCurrentTransform() {
+            const transform = document.getElementById('viewContainer').style.transform;
+            const match = transform.match(/translateX\((-?\d+(?:\.\d+)?)%\)/);
+            return match ? parseFloat(match[1]) : 0;
         }
 
         function renderGoals() {
@@ -672,22 +873,165 @@
                 return;
             }
 
+            // Обновляем прогресс на основе подцелей
+            categoryGoals.forEach(goal => {
+                if (goal.subgoals && goal.subgoals.length > 0) {
+                    const completedSubgoals = goal.subgoals.filter(sg => sg.completed).length;
+                    goal.progress = Math.round((completedSubgoals / goal.subgoals.length) * 100);
+                } else {
+                    // Если нет подцелей, прогресс остается 0, пока цель не завершена
+                    if (goal.status !== 'completed') {
+                        goal.progress = 0;
+                    }
+                }
+            });
+
             goalsList.innerHTML = categoryGoals.map(goal => `
-                <div class="goal-item" onclick="openGoalDetails('${goal.id}')">
-                    <div class="goal-header">
-                        <span class="goal-title">${goal.name}</span>
-                        <span class="goal-status ${goal.status === 'completed' ? 'status-completed' : 'status-active'}">
-                            ${goal.status === 'completed' ? 'Завершена' : 'Активна'}
-                        </span>
+                <div class="goal-item" data-goal-id="${goal.id}">
+                    <div class="delete-background">
+                        Удалить <span class="delete-icon">×</span>
                     </div>
-                    <div class="goal-progress">
-                        <div class="progress-fill" style="width: ${goal.progress}%"></div>
-                    </div>
-                    <div style="color: #ccc; font-size: 0.9rem;">
-                        ${goal.status === 'completed' ? 'Завершено' : 'Дедлайн'}: ${formatDate(goal.deadline)}
+                    <div class="goal-content" onclick="openGoalDetails('${goal.id}')">
+                        <div class="goal-header">
+                            <span class="goal-title">${goal.name}</span>
+                            <span class="goal-status ${goal.status === 'completed' ? 'status-completed' : 'status-active'}">
+                                ${goal.status === 'completed' ? 'Завершена' : 'Активна'}
+                            </span>
+                        </div>
+                        <div class="goal-progress">
+                            <div class="progress-fill" style="width: ${goal.progress}%"></div>
+                        </div>
+                        <div style="color: #ccc; font-size: 0.9rem;">
+                            ${goal.status === 'completed' ? 'Завершено' : 'Дедлайн'}: ${formatDate(goal.deadline)}
+                        </div>
                     </div>
                 </div>
             `).join('');
+
+            // Добавляем обработчики свайпа для каждой цели
+            document.querySelectorAll('.goal-item').forEach(item => {
+                setupSwipeHandlers(item);
+            });
+            
+            saveData();
+        }
+
+        function setupSwipeHandlers(element) {
+            let startX = 0;
+            let currentX = 0;
+            let isSwipping = false;
+            let deleteBackground = element.querySelector('.delete-background');
+
+            // Touch события
+            element.addEventListener('touchstart', handleStart, { passive: true });
+            element.addEventListener('touchmove', handleMove, { passive: false });
+            element.addEventListener('touchend', handleEnd, { passive: true });
+
+            // Mouse события для десктопа
+            element.addEventListener('mousedown', handleStart);
+            element.addEventListener('mousemove', handleMove);
+            element.addEventListener('mouseup', handleEnd);
+            element.addEventListener('mouseleave', handleEnd);
+
+            function handleStart(e) {
+                startX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
+                currentX = startX;
+                isSwipping = true;
+                element.classList.add('swiping');
+            }
+
+            function handleMove(e) {
+                if (!isSwipping) return;
+                
+                e.preventDefault();
+                currentX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
+                const deltaX = currentX - startX;
+                
+                // Только свайп влево
+                if (deltaX < 0) {
+                    const swipeDistance = Math.abs(deltaX);
+                    const maxSwipe = 120;
+                    const clampedDistance = Math.min(swipeDistance, maxSwipe);
+                    
+                    element.style.transform = `translateX(${-clampedDistance}px)`;
+                    
+                    // Показываем фон удаления
+                    const opacity = clampedDistance / maxSwipe;
+                    deleteBackground.style.opacity = opacity;
+                    deleteBackground.style.width = clampedDistance + 'px';
+                    
+                    if (opacity > 0.3) {
+                        deleteBackground.classList.add('visible');
+                    } else {
+                        deleteBackground.classList.remove('visible');
+                    }
+                } else {
+                    // Возвращаем в исходное положение при свайпе вправо
+                    element.style.transform = 'translateX(0)';
+                    deleteBackground.style.opacity = '0';
+                    deleteBackground.classList.remove('visible');
+                }
+            }
+
+            function handleEnd(e) {
+                if (!isSwipping) return;
+                
+                isSwipping = false;
+                element.classList.remove('swiping');
+                
+                const deltaX = currentX - startX;
+                const swipeDistance = Math.abs(deltaX);
+                
+                // Если свайп влево достаточно далеко, показываем подтверждение удаления
+                if (deltaX < -80) {
+                    const goalId = element.dataset.goalId;
+                    showDeleteConfirmation(goalId);
+                }
+                
+                // Возвращаем элемент в исходное положение
+                element.style.transform = 'translateX(0)';
+                deleteBackground.style.opacity = '0';
+                deleteBackground.classList.remove('visible');
+            }
+        }
+
+        function showDeleteConfirmation(goalId) {
+            // Находим цель
+            const goal = goals[currentCategory].find(g => g.id === goalId);
+            if (!goal) return;
+            
+            goalToDelete = { goalId, category: currentCategory };
+            document.getElementById('deleteGoalName').textContent = goal.name;
+            document.getElementById('deleteConfirmModal').classList.remove('hidden');
+        }
+
+        function cancelDelete() {
+            document.getElementById('deleteConfirmModal').classList.add('hidden');
+            goalToDelete = null;
+        }
+
+        function confirmDelete() {
+            if (!goalToDelete) return;
+            
+            const { goalId, category } = goalToDelete;
+            
+            // Находим элемент цели для анимации
+            const goalElement = document.querySelector(`[data-goal-id="${goalId}"]`);
+            if (goalElement) {
+                goalElement.classList.add('deleting');
+                
+                // Удаляем из данных после анимации
+                setTimeout(() => {
+                    goals[category] = goals[category].filter(g => g.id !== goalId);
+                    renderGoals();
+                    updateBatteryIndicator();
+                    saveData();
+                    showNotification('Цель удалена');
+                }, 300);
+            }
+            
+            document.getElementById('deleteConfirmModal').classList.add('hidden');
+            goalToDelete = null;
         }
 
         function openNewGoalModal() {
@@ -753,7 +1097,7 @@
                 name: name,
                 description: description,
                 deadline: deadline,
-                progress: 0,
+                progress: subgoals.length > 0 ? 0 : 0, // Прогресс 0% если есть подцели или нет подцелей
                 status: 'active',
                 subgoals: subgoals
             };
@@ -766,13 +1110,12 @@
             closeNewGoalModal();
             renderGoals();
             updateBatteryIndicator();
+            saveData();
             
-            // Показываем уведомление
-            showNotification('Цель успешно создана! 🎯');
+            showNotification('Цель успешно создана!');
         }
 
         function openGoalDetails(goalId) {
-            // Находим цель во всех категориях
             let targetGoal = null;
             let targetCategory = null;
             
@@ -786,7 +1129,6 @@
             
             if (!targetGoal) return;
             
-            // Создаем модальное окно с деталями цели
             const modal = document.createElement('div');
             modal.className = 'modal';
             modal.onclick = (e) => { if (e.target === modal) modal.remove(); };
@@ -863,7 +1205,6 @@
             document.getElementById('completedCount').textContent = completedGoals;
             document.getElementById('totalCount').textContent = totalGoals;
             
-            // Обновляем счетчики категорий и горящие сроки
             updateCategoryCounts();
             updateUrgentGoals();
         }
@@ -889,7 +1230,6 @@
             const today = new Date();
             const urgentGoals = [];
 
-            // Собираем все цели с близкими дедлайнами (в течение 7 дней)
             Object.values(goals).forEach(categoryGoals => {
                 categoryGoals.forEach(goal => {
                     if (goal.status === 'active') {
@@ -907,7 +1247,6 @@
                 });
             });
 
-            // Сортируем по количеству дней
             urgentGoals.sort((a, b) => a.days - b.days);
 
             if (urgentGoals.length === 0) {
@@ -956,7 +1295,6 @@
             }, 3000);
         }
 
-        // Добавляем CSS для анимаций уведомлений
         const style = document.createElement('style');
         style.textContent = `
             @keyframes slideIn {
@@ -975,12 +1313,10 @@
                 const goal = goals[category].find(g => g.id === goalId);
                 if (goal) {
                     goal.progress = parseInt(newProgress);
-                    // Обновляем прогресс-бар в модальном окне
                     const progressFill = document.querySelector('.modal .progress-fill');
                     if (progressFill) {
                         progressFill.style.width = newProgress + '%';
                     }
-                    // Обновляем текст прогресса
                     const progressLabel = document.querySelector('.modal .form-label');
                     if (progressLabel && progressLabel.textContent.includes('Прогресс:')) {
                         progressLabel.textContent = `Прогресс: ${newProgress}%`;
@@ -997,7 +1333,6 @@
                 if (goal && goal.subgoals[subgoalIndex]) {
                     goal.subgoals[subgoalIndex].completed = !goal.subgoals[subgoalIndex].completed;
                     
-                    // Автоматически обновляем прогресс цели на основе подцелей
                     const completedSubgoals = goal.subgoals.filter(sg => sg.completed).length;
                     const totalSubgoals = goal.subgoals.length;
                     if (totalSubgoals > 0) {
@@ -1006,7 +1341,8 @@
                     
                     renderGoals();
                     updateBatteryIndicator();
-                    showNotification('Подцель обновлена! 📝');
+                    saveData();
+                    showNotification('Подцель обновлена!');
                 }
             });
         }
@@ -1016,31 +1352,30 @@
                 const goal = goals[category].find(g => g.id === goalId);
                 if (goal) {
                     if (goal.status === 'completed') {
-                        showNotification('Цель уже завершена! ✅');
+                        showNotification('Цель уже завершена!');
                         return;
                     }
                     
                     goal.status = 'completed';
                     goal.progress = 100;
                     
-                    // Закрываем модальное окно
                     const modal = document.querySelector('.modal');
                     if (modal) modal.remove();
                     
                     renderGoals();
                     updateBatteryIndicator();
-                    showNotification('Поздравляем! Цель завершена! 🎉');
+                    saveData();
+                    showNotification('Поздравляем! Цель завершена!');
                 }
             });
         }
 
-        // Массив советов о целях
         const goalTips = [
-            "💡 Разбивайте большие цели на маленькие шаги - так легче начать!",
-            "🎯 Записывайте свои цели - это увеличивает шансы на успех на 42%!",
-            "⏰ Устанавливайте конкретные дедлайны для каждой цели!",
-            "📊 Отслеживайте прогресс ежедневно - это мотивирует продолжать!",
-            "🔄 Пересматривайте и корректируйте цели каждую неделю!"
+            "Разбивайте большие цели на маленькие шаги - так легче начать!",
+            "Записывайте свои цели - это увеличивает шансы на успех на 42%!",
+            "Устанавливайте конкретные дедлайны для каждой цели!",
+            "Отслеживайте прогресс ежедневно - это мотивирует продолжать!",
+            "Пересматривайте и корректируйте цели каждую неделю!"
         ];
 
         const motivationalQuotes = [
@@ -1059,20 +1394,34 @@
             return motivationalQuotes[Math.floor(Math.random() * motivationalQuotes.length)];
         }
 
-        // Инициализация при загрузке
         document.addEventListener('DOMContentLoaded', function() {
+            loadData();
+            setupViewSwipe();
             updateBatteryIndicator();
             
-            // Устанавливаем минимальную дату для дедлайнов
             const today = new Date().toISOString().split('T')[0];
             document.getElementById('goalDeadline').min = today;
             
-            // Устанавливаем случайный совет и мотивацию
             document.getElementById('goalTip').textContent = getRandomTip();
             document.getElementById('dailyMotivation').textContent = getRandomMotivation();
             
-            showNotification('Добро пожаловать в "Мои цели!" 🚀');
+            // Восстанавливаем состояние экрана если была открыта категория
+            if (currentCategory) {
+                const categoryNames = {
+                    spiritual: 'Духовные цели',
+                    family: 'Семья и друзья',
+                    health: 'Здоровье',
+                    personal: 'Личностный рост',
+                    career: 'Карьера и финансы',
+                    hobbies: 'Хобби и отдых'
+                };
+                document.getElementById('viewContainer').style.transform = 'translateX(-50%)';
+                document.getElementById('categoryTitle').textContent = categoryNames[currentCategory];
+                renderGoals();
+            }
+            
+            showNotification('Добро пожаловать в "Мои цели!"');
         });
     </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'97ac52e9b78feded',t:'MTc1NzE0NDQ4NS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'97ac6aaa94119243',t:'MTc1NzE0NTQ1OC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
